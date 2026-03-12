@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open Google Photos Picker</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+
+    :root {
+      --bg: #0d0d0f;
+      --surface: #161618;
+      --border: #2a2a2e;
+      --accent: #4ade80;
+      --accent-dim: rgba(74, 222, 128, 0.12);
+      --text: #f0f0f2;
+      --muted: #6b6b72;
+      --warn: #facc15;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      gap: 0;
+    }
+
+    /* subtle grid bg */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 32px 32px;
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 0 0 60px rgba(74,222,128,0.06), 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text);
+    }
+
+    .badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 500;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(74,222,128,0.25);
+      border-radius: 20px;
+      padding: 3px 10px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      padding: 12px 14px;
+      resize: vertical;
+      min-height: 80px;
+      outline: none;
+      transition: border-color 0.2s;
+      word-break: break-all;
+    }
+
+    textarea:focus {
+      border-color: rgba(74,222,128,0.4);
+    }
+
+    textarea::placeholder {
+      color: #3a3a42;
+    }
+
+    .notice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: rgba(250,204,21,0.06);
+      border: 1px solid rgba(250,204,21,0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--warn);
+    }
+
+    .notice svg { flex-shrink: 0; margin-top: 1px; }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--accent);
+      color: #050905;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 20px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      text-decoration: none;
+      width: 100%;
+    }
+
+    .btn:active { transform: scale(0.98); opacity: 0.9; }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      font-size: 11px;
+      text-align: center;
+      color: var(--muted);
+      min-height: 16px;
+      transition: color 0.2s;
+    }
+
+    .status.ok { color: var(--accent); }
+    .status.err { color: #f87171; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 -4px;
+    }
+
+    .how {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #9999a2;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="logo-row">
+      <!-- Google Photos logo SVG -->
+      <svg class="logo-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="14" cy="14" r="10" fill="#EA4335"/>
+        <circle cx="34" cy="14" r="10" fill="#FBBC05"/>
+        <circle cx="14" cy="34" r="10" fill="#34A853"/>
+        <circle cx="34" cy="34" r="10" fill="#4285F4"/>
+      </svg>
+      <h1>Photos Picker Launcher</h1>
+      <span class="badge">iOS workaround</span>
+    </div>
+
+    <div class="input-group">
+      <div class="label">Paste your pickerUri</div>
+      <textarea id="pickerUrl" placeholder="https://photospicker.googleapis.com/v1/..."></textarea>
+    </div>
+
+    <div class="notice">
+      <svg width="14" height="14" fill="none" viewBox="0 0 16 16">
+        <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-3a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 5Zm0 7.5a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75Z" fill="#facc15"/>
+      </svg>
+      Share this page URL to yourself via <strong style="color:#fde047">Notes or Mail</strong>, then tap the button from Safari — not from Slack — so iOS can route to Google Photos.
+    </div>
+
+    <button class="btn" id="openBtn" onclick="openPicker()" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M14 3h7v7m0-7L10 14M5 5h5V3H3v18h18v-7h-2v5H5V5Z" stroke="#050905" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Open in Google Photos
+    </button>
+
+    <div class="status" id="status">Paste a pickerUri above to continue</div>
+
+    <div class="divider"></div>
+
+    <div class="how">
+      <div class="label">How to use</div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <span>Paste the <code style="color:var(--accent)">pickerUri</code> from your backend response above.</span>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <span>Copy this page's URL and send it to yourself via <strong style="color:var(--text)">Apple Notes or Mail</strong>.</span>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <span>Open the link from <strong style="color:var(--text)">Safari</strong> — iOS universal links will route to Google Photos natively.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const ta = document.getElementById('pickerUrl');
+    const btn = document.getElementById('openBtn');
+    const status = document.getElementById('status');
+
+    // Restore from hash on load
+    window.addEventListener('load', () => {
+      if (location.hash) {
+        try {
+          const decoded = decodeURIComponent(location.hash.slice(1));
+          ta.value = decoded;
+          validate();
+        } catch {}
+      }
+    });
+
+    ta.addEventListener('input', () => {
+      validate();
+      // store url in hash so you can share this page with the url pre-filled
+      const val = ta.value.trim();
+      if (val) {
+        history.replaceState(null, '', '#' + encodeURIComponent(val));
+      } else {
+        history.replaceState(null, '', location.pathname);
+      }
+    });
+
+    function validate() {
+      const val = ta.value.trim();
+      const isUrl = val.startsWith('https://');
+      btn.disabled = !isUrl;
+      if (!val) {
+        status.textContent = 'Paste a pickerUri above to continue';
+        status.className = 'status';
+      } else if (!isUrl) {
+        status.textContent = 'URL must start with https://';
+        status.className = 'status err';
+      } else {
+        status.textContent = 'Ready — tap the button from Safari for best results';
+        status.className = 'status ok';
+      }
+    }
+
+    function openPicker() {
+      const url = ta.value.trim();
+      if (!url) return;
+      // window.location.href lets iOS universal links fire, unlike window.open in webviews
+      window.location.href = url;
+    }
+  </script>
+</body>
+</html>
