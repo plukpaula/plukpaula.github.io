@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paula's Profile</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+      background-color: #FAFAFB;
+    }
+
+    /* Particle Canvas */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: auto;
+      /* Required for canvas to trace mouse if not handled by window */
+    }
+
+    /* Navigation */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 48px;
+      box-sizing: border-box;
+      z-index: 10;
+      pointer-events: none;
+      /* Let clicks pass unless on elements */
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 20px;
+      color: #202124;
+      pointer-events: auto;
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      gap: 12px;
+    }
+
+    .logo-container span {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .logo-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    nav {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 40px;
+      pointer-events: auto;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #5F6368;
+      font-weight: 500;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+      position: relative;
+    }
+
+    nav a:hover {
+      color: #202124;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #202124;
+      transition: width 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .nav-arrow {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+      stroke-width: 2;
+    }
+
+    .btn-download-top {
+      background-color: #1A1A1A;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), background-color 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-download-top:hover {
+      transform: translateY(-2px);
+      background-color: #2c2c2c;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+      z-index: 5;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      pointer-events: none;
+    }
+
+    .sub-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      font-weight: 500;
+      font-size: 20px;
+      color: #333;
+      letter-spacing: -0.01em;
+    }
+
+    .sub-logo span {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .hero h1 {
+      font-size: 88px;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: #1A1A1A;
+      margin: 0 0 48px 0;
+      font-weight: 500;
+      font-feature-settings: "ss01", "ss02";
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      pointer-events: auto;
+    }
+
+    .action-buttons a {
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 16px 32px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .btn-primary {
+      background-color: #1A1A1A;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      background-color: #333;
+      box-shadow: 0 10px 25px rgba(26, 26, 26, 0.3);
+    }
+
+    .btn-secondary {
+      background-color: #F8F9FA;
+      color: #1A1A1A;
+      border: 1px solid #EAEAEA;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      background-color: #fff;
+      border-color: #D1D5DB;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .apple-icon {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      margin-bottom: 2px;
+    }
+
+    /* Carousel Section */
+    .achievements-section {
+      position: relative;
+      z-index: 5;
+      padding: 80px 0 120px 0;
+      background: transparent;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 40px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin-bottom: 48px;
+      letter-spacing: -0.02em;
+    }
+
+    .slider-wrapper {
+      position: relative;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .slider-container {
+      display: flex;
+      gap: 32px;
+      /* Smoother scaling gap for many items */
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      /* Firefox */
+      padding: 20px 48px 40px 48px;
+      /* 20px top to prevent crop */
+      scroll-padding: 0 48px;
+      align-items: center;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .slider-container::-webkit-scrollbar {
+      display: none;
+      /* Chrome/Safari */
+    }
+
+    .slider-card {
+      flex: 0 0 320px;
+      /* slightly wider */
+      height: 420px;
+      /* taller to emphasize */
+      border-radius: 20px;
+      background-color: #fff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      /* slightly stronger base shadow */
+      scroll-snap-align: start;
+      /* snap to left edge instead of center */
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s;
+      transform-origin: center bottom;
+      box-sizing: border-box;
+    }
+
+    .slider-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      z-index: 2;
+    }
+
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .slider-card:hover .card-image {
+      transform: scale(1.05);
+      /* keep photo zoom on hover */
+    }
+
+    .card-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 40px 20px 20px;
+      /* taller gradient */
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+      color: white;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      opacity: 0.8;
+      margin: 0;
+    }
+
+    .slider-nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px auto 0 auto;
+      /* pulled up closer to cards */
+      padding: 0 48px;
+      max-width: 1200px;
+      /* prevents arrows from stretching too far apart */
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .slider-arrow {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #E8EAED;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.2s, transform 0.2s;
+      color: #202124;
+    }
+
+    .slider-arrow:hover {
+      background: #DADCE0;
+      transform: scale(1.05);
+    }
+
+    .slider-arrow svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      /* Screen back background (darker overlay) */
+      backdrop-filter: blur(12px);
+      /* Intensify blur to screen back */
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #EAEAEA;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 24px;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: #F8F9FA;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #5F6368;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .modal-close:hover {
+      background: #EAEAEA;
+      color: #1a1a1a;
+    }
+
+    .modal-body {
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .modal-image {
+      width: 100%;
+      border-radius: 12px;
+      height: auto;
+      max-height: 400px;
+      object-fit: cover;
+      margin-bottom: 24px;
+    }
+
+    .modal-desc {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #5F6368;
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      .hero h1 {
+        font-size: 60px;
+      }
+
+      nav {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 44px;
+        padding: 0 20px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        padding: 0 20px;
+      }
+
+      header {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Background Particle System -->
+  <canvas id="particles-canvas"></canvas>
+
+  <header>
+    <a href="#" class="logo-container">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 22H10L12 18L14 22H22L12 2Z" fill="url(#paint0_linear)" />
+        <defs>
+          <linearGradient id="paint0_linear" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#4A62FF" />
+            <stop offset="0.5" stop-color="#DE5467" />
+            <stop offset="1" stop-color="#F59E0B" />
+          </linearGradient>
+        </defs>
+      </svg>
+      Poolang
+    </a>
+
+    <nav>
+      <a href="#about">Me</a>
+      <a href="#experience">
+        Experience
+        <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </a>
+      <a href="https://bit.ly/plukapply">Jobs</a>
+      <a href="#skills">Inside Branch</a>
+      <a href="https://bit.ly/plukfps">
+        Ask for qoute
+        <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </a>
+    </nav>
+
+    <a href="#" class="btn-download-top">
+      Download CV
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4 4m0 0l-4-4m4 4V4"></path>
+      </svg>
+    </a>
+  </header>
+
+  <main class="hero">
+    <h1>Experience innovation with a next-generation Finacial Advisor</h1>
+
+    <div class="action-buttons">
+      <a href="https://bit.ly/plukpaula" class="btn-primary">
+        Book a Meeting
+      </a>
+      <a href="#" class="btn-secondary">
+        Explore products
+      </a>
+    </div>
+  </main>
+
+  <!-- Achievements Slider Section -->
+  <section class="achievements-section" id="experience">
+    <h2 class="section-title">My Journey to PruLife UK</h2>
+    <div class="slider-wrapper">
+      <div class="slider-container" id="slider">
+        <!-- Cards dynamically populated by JS at the bottom of the script for easy modification -->
+      </div>
+
+      <div class="slider-nav-container">
+        <button class="slider-arrow" id="btn-prev">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <button class="slider-arrow" id="btn-next">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Achievement</h2>
+        <button class="modal-close" id="modal-close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img src="" alt="" class="modal-image" id="modal-image">
+        <p class="modal-desc" id="modal-desc">Description</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let particles = [];
+    const colorPalette = ['#fc0303', '#f05151', '#eb3925', '#eb257b', '#eb2557', '#eb2528'];
+
+    let mouse = { x: -1000, y: -1000, isActive: false };
+    let mouseTimeout;
+
+    // Add event listeners for mouse
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.isActive = true;
+
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(() => {
+        mouse.isActive = false;
+      }, 250); // Becomes inactive if mouse stops moving
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.isActive = false;
+    });
+
+    // Add touch support
+    window.addEventListener('touchstart', (e) => {
+      mouse.x = e.touches[0].clientX;
+      mouse.y = e.touches[0].clientY;
+      mouse.isActive = true;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      mouse.x = e.touches[0].clientX;
+      mouse.y = e.touches[0].clientY;
+      mouse.isActive = true;
+
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(() => {
+        mouse.isActive = false;
+      }, 250);
+    });
+
+    window.addEventListener('touchend', () => {
+      mouse.isActive = false;
+    });
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+
+        this.size = Math.random() * 1 + 0.5;
+        this.length = Math.random() * 6 + 2;
+        this.color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+
+        this.vx = 0;
+        this.vy = 0;
+        this.flowOffset = Math.random() * Math.PI * 2; // Unique wobble phase
+        this.speedMultiplier = Math.random() * 0.5 + 0.5; // Parallax effect
+      }
+
+      update() {
+        let time = Date.now() * 0.001;
+
+        // --- Water Flow / Freewill Base Movement ---
+        // Base direction: diagonal up-right
+        // Wavy movement created by sine oscillating the angle
+        let flowAngle = -Math.PI / 4 + Math.sin(time + this.flowOffset) * 0.4;
+        let baseSpeed = 0.5 * this.speedMultiplier; // very slow and peaceful
+
+        let targetVx = Math.cos(flowAngle) * baseSpeed;
+        let targetVy = Math.sin(flowAngle) * baseSpeed;
+
+        // --- Magnetic Repel Interaction on Mouse Move ---
+        if (mouse.isActive) {
+          let dx = this.x - mouse.x;
+          let dy = this.y - mouse.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          let repelRadius = width * 1.5; // 65% of width in diameter -> 32.5% radius
+
+          if (dist < repelRadius && dist > 0) {
+            // Apply reverse polarity (repel)
+            // Quadratic falloff so it's softer at the edges
+            let force = Math.pow(1 - (dist / repelRadius), 2) * 1.5;
+            targetVx += (dx / dist) * force;
+            targetVy += (dy / dist) * force;
+          }
+        }
+
+        // Smoothly interpolate current velocity towards target
+        // Giving it a very slight delay which mimics fluid drag
+        this.vx += (targetVx - this.vx) * 0.91;
+        this.vy += (targetVy - this.vy) * 0.91;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Wrap around gracefully offscreen
+        if (this.x < -50) this.x = width + 50;
+        if (this.x > width + 50) this.x = -50;
+        if (this.y < -50) this.y = height + 50;
+        if (this.y > height + 50) this.y = -50;
+      }
+
+      draw(ctx) {
+        let drawAngle = Math.atan2(this.vy, this.vx);
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(drawAngle);
+        ctx.fillStyle = this.color;
+
+        ctx.beginPath();
+        ctx.roundRect(-this.length / 2, -this.size / 2, this.length, this.size, this.size / 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function init() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+
+      particles = [];
+      // Persistent particle pool instead of continuous spawning
+      const particleCount = Math.min(Math.floor(width * height / 3000), 500);
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw(ctx);
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+      init();
+    });
+
+    init();
+    animate();
+
+    // === Carousel & Modal Logic ===
+    // Define Mock Data Array (Easy to modify here!)
+    const mockAchievements = [
+      { title: "BYB 2025", subtitle: "Britany Hotel - Villar City", desc: "Recognized for outstanding contributions to the Antigravity engineering framework, improving system performance by 40% globally.", img: "https://plukpaula.github.io/about/plukpaula.png" },
+      { title: "Open Source Contributor", subtitle: "10M+ Downloads", desc: "Lead maintainer for several vital open-source libraries used by developers worldwide, surpassing 10 million total downloads.", img: "https://plukpaula.github.io/faflia/1.jpeg" },
+      { title: "Tech Speaker", subtitle: "Global Summit", desc: "Keynote speaker at the International Web Architecture Summit, discussing next-generation canvas rendering techniques.", img: "https://plukpaula.github.io/faflia/2.jpeg" },
+      { title: "Patent Pending", subtitle: "Algorithm Design", desc: "Filing for an innovative data compression algorithm that minimizes latency in distributed environments.", img: "https://plukpaula.github.io/faflia/3.jpeg" },
+      { title: "Hackathon Winner", subtitle: "AI Innovation", desc: "First place winner among 200+ teams in the global AI challenge with an autonomous intelligent caching system.", img: "https://plukpaula.github.io/faflia/4.jpeg" },
+      { title: "Team Leadership", subtitle: "Scaled from 5 to 50", desc: "Successfully scaled the engineering team while maintaining a 98% retention rate and improving delivery velocity.", img: "https://plukpaula.github.io/faflia/5.jpeg" },
+      { title: "Publication Featured", subtitle: "Wired Magazine", desc: "Featured in an exclusive piece about the future of web rendering and high-performance user interfaces.", img: "https://picsum.photos/id/17/600/800" },
+      { title: "Cloud Migration", subtitle: "Zero Downtime", desc: "Orchestrated a massive multi-region cloud migration for a top-tier enterprise client with zero seconds of downtime.", img: "https://picsum.photos/id/18/600/800" },
+      { title: "Accessibility Champion", subtitle: "WCAG 2.1 AA", desc: "Lead the initiative to make our entire product suite 100% compliant with accessibility guidelines.", img: "https://picsum.photos/id/19/600/800" },
+      { title: "Security Audit", subtitle: "Flawless Record", desc: "Passed a rigorous third-party security audit with zero critical vulnerabilities in our core infrastructure.", img: "https://picsum.photos/id/20/600/800" },
+      { title: "Mentor of the Year", subtitle: "Internal Awards", desc: "Voted by peers as the most influential engineering mentor, having successfully guided 15 junior developers.", img: "https://picsum.photos/id/21/600/800" },
+      { title: "Performance Tuning", subtitle: "Sub-100ms Load", desc: "Re-architected the frontend delivery pipeline to achieve consistent sub-100ms load times worldwide.", img: "https://picsum.photos/id/22/600/800" },
+      { title: "Data Pipeline", subtitle: "Petabyte Scale", desc: "Designed a resilient data ingestion pipeline capable of processing over a petabyte of analytical data daily.", img: "https://picsum.photos/id/23/600/800" },
+      { title: "API Design", subtitle: "Developer First", desc: "Crafted a public-facing API product that now serves over 5,000 active developers seamlessly.", img: "https://picsum.photos/id/24/600/800" },
+      { title: "UX overhaul", subtitle: "30% Conversion Boost", desc: "Collaborated with design to revamp the core user journey, directly increasing conversion rates by 30%.", img: "https://picsum.photos/id/25/600/800" },
+      { title: "Community Builder", subtitle: "10k+ Members", desc: "Founded and currently moderate the largest local engineering meetup group featuring monthly technical talks.", img: "https://picsum.photos/id/26/600/800" },
+      { title: "Cost Optimization", subtitle: "Saved $2M/yr", desc: "Identified and resolved infrastructure inefficiencies, resulting in a dramatic $2 million annual saving.", img: "https://picsum.photos/id/27/600/800" },
+      { title: "Mobile Framework", subtitle: "Cross-platform Core", desc: "Built a unified cross-platform mobile core that reduced development time by 50% across iOS and Android.", img: "https://picsum.photos/id/28/600/800" },
+      { title: "Incident Response", subtitle: "5m MTTR", desc: "Revamped the incident response protocol, driving the Mean Time to Resolution down to just 5 minutes.", img: "https://picsum.photos/id/29/600/800" },
+      { title: "Board Member", subtitle: "Tech Advisory", desc: "Invited to sit on the technical advisory board for a prominent ed-tech non-profit organization.", img: "https://picsum.photos/id/30/600/800" }
+    ];
+
+    const slider = document.getElementById('slider');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+
+    const modal = document.getElementById('modal');
+    const modalCloseBtn = document.getElementById('modal-close');
+    const modalTitle = document.getElementById('modal-title');
+    const modalImage = document.getElementById('modal-image');
+    const modalDesc = document.getElementById('modal-desc');
+
+    // Populate Mock Data into Slider
+    mockAchievements.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'slider-card';
+      card.innerHTML = `
+        <img src="${item.img}" alt="${item.title}" class="card-image" loading="lazy">
+        <div class="card-overlay">
+          <h3 class="card-title">${item.title}</h3>
+          <p class="card-subtitle">${item.subtitle}</p>
+        </div>
+      `;
+
+      // Open modal on click ANYWHERE unconditionally
+      card.addEventListener('click', () => {
+        modalTitle.textContent = item.title;
+        modalDesc.textContent = item.desc;
+        modalImage.src = item.img;
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden'; // prevent bg scrolling
+      });
+
+      slider.appendChild(card);
+    });
+
+    // Scroll buttons
+    btnPrev.addEventListener('click', () => {
+      // scroll left by one card width + gap (320 + 32 = 352) -> approx 360
+      slider.scrollBy({ left: -360, behavior: 'smooth' });
+    });
+
+    btnNext.addEventListener('click', () => {
+      slider.scrollBy({ left: 360, behavior: 'smooth' });
+    });
+
+    // Modal behavior
+    modalCloseBtn.addEventListener('click', () => {
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+
+  </script>
+</body>
+
+</html>
